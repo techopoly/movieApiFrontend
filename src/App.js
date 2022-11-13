@@ -13,7 +13,11 @@ function App() {
   const [year, setyear] = useState("");
   const [description, setdescription] = useState("");
 
+  const [searchTitle, setSearchtitle] = useState("");
+  const [searchAuthor, setSearchauthor] = useState("");
+
   const [data, setData] = useState([]);
+  const [searchData, setSearchData] = useState([])
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -34,6 +38,25 @@ function App() {
         console.log(response.data);
       });
   };
+  const searchSubmitHandler = (event) => {
+    event.preventDefault();
+    console.log("data sending: ", {
+      searchTitle: searchAuthor,
+      searchAuthor: searchAuthor,
+    });
+    axios
+      .get(`http://localhost:8051/movies?title=${searchTitle}&author=${searchAuthor}`, {
+        searchTitle: searchAuthor,
+        searchAuthor: searchAuthor,
+      })
+      .then((response) => {
+        console.log(response.data);
+        setSearchData((prev) => {
+          return response.data.data;
+        });
+      });
+  };
+
   let movieArray = [];
   useEffect(() => {
     axios.get(baseURL).then((response) => {
@@ -100,6 +123,47 @@ function App() {
             Submit
           </button>
         </form>
+      </div>
+
+      <div>
+        <h1>Search Movie</h1>
+        <form>
+          <input
+            value={searchTitle}
+            onChange={(e) => { console.log(e.target.value) 
+              return setSearchtitle(e.target.value)}}
+             
+            placeholder="Title"
+            type="text"
+            name="title"
+            required
+          />
+          <input
+            value={searchAuthor}
+            onChange={(e) => setSearchauthor(e.target.value)}
+            placeholder="Author"
+            type="text"
+            name="author"
+            required
+          />
+          <button type="submit" onClick={searchSubmitHandler}>
+            Submit
+          </button>
+        </form>
+        <h1>Search Result</h1>
+      {data.length > 0 ? (
+        searchData.map((element) => {
+          return (
+            <div>
+              <h2>Movie Name: {element.title}</h2>
+              <p>Movie Author: {element.title}</p>
+              <p>Movie Description: {element.desc}</p>
+            </div>
+          );
+        })
+      ) : (
+        <p>No Movie data found</p>
+      )}
       </div>
     </>
   );
